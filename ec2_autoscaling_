@@ -1,15 +1,15 @@
 #!/bin/sh
 
-SCALEGROUP=$(basename $0|grep -P -o '(?<=ec2_autoscale_).*')
+SCALEGROUP=$(basename $0|grep -P -o '(?<=ec2_autoscaling_).*')
 
 if [ -z "$SCALEGROUP" ]; then
-	echo 'Cannot read scalegroup' >&2
+	echo 'Cannot read scaling group' >&2
 	exit 1
 fi
 
 case $1 in
 	config)
-		echo "graph_title EC2 $SCALEGROUP Autoscale Group Stats"
+		echo "graph_title EC2 $SCALEGROUP Auto Scaling Group Stats"
 		echo 'graph_vlabel servers'
 		echo 'graph_category ec2'
 		echo 'min.label min'
