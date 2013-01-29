@@ -1,0 +1,78 @@
+#!/bin/sh
+
+SCALEGROUP=$(basename $0|grep -P -o '(?<=ec2_autoscale_).*')
+
+if [ -z "$SCALEGROUP" ]; then
+	echo 'Cannot read scalegroup' >&2
+	exit 1
+fi
+
+case $1 in
+	config)
+		echo "graph_title EC2 $SCALEGROUP Autoscale Group Stats"
+		echo 'graph_vlabel servers'
+		echo 'graph_category ec2'
+		echo 'min.label min'
+		echo 'desired.label desired'
+		echo 'inservice.label in service'
+		echo 'terminating.label terminating' 
+		echo 'pending.label pending'
+		echo 'healthy.label healthy'
+		echo 'unhealthy.label unhealthy'
+		exit 0;;
+esac
+
+if [ -z "$JAVA_HOME" ]; then
+	JAVA_HOME=$(readlink -f $(which java)|grep -P -o '.*(?=/bin/java)')
+fi
+
+if [ -z "$AWS_ACCESS_KEY_ID" ]; then
+	echo 'AWS ID not specified. Set env.AWS_ACCESS_KEY_ID' >&2
+	exit 1
+fi
+
+if [ -z "$AWS_SECRET_ACCESS_KEY" ]; then
+	echo 'AWS Secret not specified. Set env.AWS_SECRET_ACCESS_KEY' >&2
+	exit 1
+fi
+
+if [ ! -x $AWS_AUTO_SCALING_HOME/bin/as-describe-auto-scaling-groups ]; then
+	echo 'Cannot execute as-describe-auto-scaling-groups. Set env.AWS_AUTO_SCALING_HOME' >&2
+	exit 1
+fi
+
+TMPFILE=$(mktemp)
+if [ ! -w $TMPFILE ]; then
+	echo "Cannot write to temp file $TMPFILE" >&2
+	exit 1
+fi
+
+export AWS_AUTO_SCALING_HOME
+export JAVA_HOME
+$AWS_AUTO_SCALING_HOME/bin/as-describe-auto-scaling-groups $SCALEGROUP --show-long -I $AWS_ACCESS_KEY_ID -S $AWS_SECRET_ACCESS_KEY > $TMPFILE
+if [ $? -ne 0 ]; then
+	echo 'Failed to run as-describe-auto-scaling-groups' >&2
+	#rm $TMPFILE
+	exit 1
+fi
+
+
+MIN=$(grep -P '^AUTO-SCALING-GROUP' $TMPFILE|awk -F\, '{print $8}')
+DESIRED=$(grep -P '^AUTO-SCALING-GROUP' $TMPFILE|awk -F\, '{print $10}')
+INSERVICE=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $5}'|grep -i inservice|wc -l)
+TERMINATING=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $5}'|grep -i terminating|wc -l)
+PENDING=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $5}'|grep -i pending|wc -l)
+HEALTHY=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $6}'|grep -iP '^healthy'|wc -l)
+UNHEALTHY=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $6}'|grep -iP '^unhealthy'|wc -l)
+
+#rm $TMPFILE
+
+echo "min.value $MIN"
+echo "desired.value $DESIRED"
+echo "inservice.value $INSERVICE"
+echo "terminating.value $TERMINATING"
+echo "pending.value $PENDING"
+echo "healthy.value $HEALTHY"
+echo "unhealthy.value $UNHEALTHY"
+
+exit 0
