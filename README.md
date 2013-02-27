@@ -8,21 +8,21 @@ Prerequisites
 - Read access to part of the Autoscaling API
 
 ~~~
-   {
-     "Statement": [
-       {
-         "Sid": "Stmt1359392163080",
-         "Action": [
-           "autoscaling:DescribeAutoScalingGroups",
-           "autoscaling:DescribeAutoScalingInstances"
-         ],
-         "Effect": "Allow",
-         "Resource": [
-           "*"
-         ]
-       }
-     ]
-   }
+{
+  "Statement": [
+    {
+      "Sid": "Stmt1359392163080",
+      "Action": [
+        "autoscaling:DescribeAutoScalingGroups",
+        "autoscaling:DescribeAutoScalingInstances"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
 ~~~
 
 
