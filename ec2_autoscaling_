@@ -52,7 +52,7 @@ export JAVA_HOME
 $AWS_AUTO_SCALING_HOME/bin/as-describe-auto-scaling-groups $SCALEGROUP --show-long -I $AWS_ACCESS_KEY_ID -S $AWS_SECRET_ACCESS_KEY > $TMPFILE
 if [ $? -ne 0 ]; then
 	echo 'Failed to run as-describe-auto-scaling-groups' >&2
-	#rm $TMPFILE
+	rm $TMPFILE
 	exit 1
 fi
 
@@ -65,7 +65,7 @@ PENDING=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $5}'|grep -i pending|wc 
 HEALTHY=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $6}'|grep -iP '^healthy'|wc -l)
 UNHEALTHY=$(grep -P '^INSTANCE' $TMPFILE|awk -F\, '{print $6}'|grep -iP '^unhealthy'|wc -l)
 
-#rm $TMPFILE
+rm $TMPFILE
 
 echo "min.value $MIN"
 echo "desired.value $DESIRED"
