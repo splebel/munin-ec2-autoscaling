@@ -7,6 +7,7 @@ Prerequisites
 - Java JRE
 - Read access to part of the Autoscaling API
 
+~~~
    {
      "Statement": [
        {
@@ -22,7 +23,7 @@ Prerequisites
        }
      ]
    }
-
+~~~
 
 
 Installation
