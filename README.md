@@ -5,6 +5,25 @@ Prerequisites
 -------------
 - Auto Scaling Command Line Tool (http://aws.amazon.com/developertools/2535)
 - Java JRE
+- Read access to part of the Autoscaling API
+
+    {
+      "Statement": [
+        {
+          "Sid": "Stmt1359392163080",
+          "Action": [
+            "autoscaling:DescribeAutoScalingGroups",
+            "autoscaling:DescribeAutoScalingInstances"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "*"
+          ]
+        }
+      ]
+    }
+
+
 
 Installation
 ------------
